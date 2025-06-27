@@ -1,8 +1,8 @@
-# ZS6BVR Morese sender Java project
-This allows you to type text to send morse code
+# ZS6BVR Morse sender Java project
+This allows you to type text to send Morse code
 ```
-pressing @ will send a contnuous streem of dots to calibrate with oscilloscope
-pressing # will send a contnuous tone to calibrate with frequency counter
+Pressing @ will send a continuous stream of dots to calibrate with the oscilloscope
+Pressing # will send a continuous tone to calibrate with the frequency counter
 pressing * to exit
 ```
 ---
