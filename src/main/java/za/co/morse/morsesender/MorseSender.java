@@ -32,8 +32,8 @@ public class MorseSender {
 
     public void sender() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("\nMorse Code Sender Ready!");
-        System.out.println("Type message and press ENTER");
+        System.out.println("\n\nZS6BVR Morse Code Sender");
+        System.out.println("Type message or specil key and press ENTER");
         System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous tone\n");
 
         while (true) {
@@ -73,6 +73,7 @@ public class MorseSender {
                 pause(unit * 2); // Between letters (total of 3 units with above)
             }
             pause(unit * 4); // Between words (total of 7 units)
+            System.out.println();
         }
     }
 
