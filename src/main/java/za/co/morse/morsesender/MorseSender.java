@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class MorseSender {
     private final ToneGenerator toneGen;
     private int wpm;
+    private final int freq; // New field to store frequency
 
     private static final Map<Character, String> MORSE = new HashMap<>();
 
@@ -26,14 +27,16 @@ public class MorseSender {
     }
 
     public MorseSender(int freq, int wpm) {
-        this.toneGen = new ToneGenerator(freq);
+        this.freq = freq;
         this.wpm = wpm;
+        this.toneGen = new ToneGenerator(freq);
     }
 
     public void sender() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\n\nZS6BVR Morse Code Sender");
-        System.out.println("Type message or specil key and press ENTER");
+        System.out.println("Speed: " + wpm + " WPM    Tone: " + freq + " Hz");
+        System.out.println("Type message or special key and press ENTER");
         System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous tone\n");
 
         while (true) {
@@ -70,9 +73,9 @@ public class MorseSender {
                     playSymbol(sym, unit);
                     pause(unit); // Between symbols
                 }
-                pause(unit * 2); // Between letters (total of 3 units with above)
+                pause(unit * 2); // Between letters
             }
-            pause(unit * 4); // Between words (total of 7 units)
+            pause(unit * 4); // Between words
             System.out.println();
         }
     }
