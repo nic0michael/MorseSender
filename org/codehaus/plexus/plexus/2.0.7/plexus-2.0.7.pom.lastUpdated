@@ -1,0 +1,7 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 29 14:11:34 SAST 2025
+https\://repo.maven.apache.org/maven2/.lastUpdated=1751199094452
+http\://nx.lss.si/repository/loyalty-group/.error=Could not transfer artifact org.codehaus.plexus\:plexus\:pom\:2.0.7 from/to loyalty (http\://nx.lss.si/repository/loyalty-group/)\: nx.lss.si
+@default-loyaltySolutions-http\://nx.lss.si/repository/lss-group/.lastUpdated=1751199094441
+http\://nx.lss.si/repository/lss-group/.error=Could not transfer artifact org.codehaus.plexus\:plexus\:pom\:2.0.7 from/to loyaltySolutions (http\://nx.lss.si/repository/lss-group/)\: nx.lss.si
+@default-loyalty-http\://nx.lss.si/repository/loyalty-group/.lastUpdated=1751199094440

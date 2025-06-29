@@ -1,0 +1,7 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Sun Jun 29 14:11:36 SAST 2025
+https\://repo.maven.apache.org/maven2/.lastUpdated=1751199096654
+http\://nx.lss.si/repository/loyalty-group/.error=Could not transfer artifact org.junit\:junit-bom\:pom\:5.10.0 from/to loyalty (http\://nx.lss.si/repository/loyalty-group/)\: nx.lss.si
+@default-loyaltySolutions-http\://nx.lss.si/repository/lss-group/.lastUpdated=1751199096647
+http\://nx.lss.si/repository/lss-group/.error=Could not transfer artifact org.junit\:junit-bom\:pom\:5.10.0 from/to loyaltySolutions (http\://nx.lss.si/repository/lss-group/)\: nx.lss.si
+@default-loyalty-http\://nx.lss.si/repository/loyalty-group/.lastUpdated=1751199096646

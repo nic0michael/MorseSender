@@ -1,0 +1,33 @@
+# Ignore Maven build directory
+/target/
+
+# Ignore IDE-specific files
+# IntelliJ IDEA
+*.iml
+.idea/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore compiled classes and temporary files
+*.class
+*.jar
+*.war
+*.ear
+
+# Ignore backup files
+*~
+*.swp
+*.bak
