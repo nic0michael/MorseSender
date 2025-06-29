@@ -2,7 +2,7 @@ Here’s an improved and expanded version of your `README.md`, with clearly stru
 
 ---
 
-````markdown
+
 # ZS6BVR Morse Sender (Java Project)
 
 This Java application allows you to type text and have it translated and sent as Morse code using sound tones.
