@@ -7,7 +7,10 @@ import java.util.Scanner;
 public class MorseSender {
     private final ToneGenerator toneGen;
     private int wpm;
-    private final int freq; // New field to store frequency
+    private final int freq;
+
+    // Memory variables mem1 to mem6
+    private final String[] mem = new String[7]; // index 1 to 6 used
 
     private static final Map<Character, String> MORSE = new HashMap<>();
 
@@ -30,6 +33,8 @@ public class MorseSender {
         this.freq = freq;
         this.wpm = wpm;
         this.toneGen = new ToneGenerator(freq);
+        // Initialize mem slots to empty string
+        for (int i = 1; i <= 6; i++) mem[i] = "";
     }
 
     public void sender() {
@@ -41,8 +46,25 @@ public class MorseSender {
 
         while (true) {
             System.out.print("> ");
-            String input = scanner.nextLine().toUpperCase().trim();
+            String input = scanner.nextLine().trim();
 
+            // Check for !1 to !6 commands to store memory
+            if (input.length() > 2 && input.charAt(0) == '!' && input.charAt(1) >= '1' && input.charAt(1) <= '6' && input.charAt(2) == ' ') {
+                int slot = input.charAt(1) - '0';
+                mem[slot] = input.substring(3);
+                System.out.println("Mem" + slot + " stored.");
+                continue;
+            }
+
+            // Replace $1 to $6 placeholders with stored mem text if any
+            for (int i = 1; i <= 6; i++) {
+                String key = "$" + i;
+                if (!mem[i].isEmpty() && input.contains(key)) {
+                    input = input.replace(key, mem[i]);
+                }
+            }
+
+            // Special commands
             switch (input) {
                 case "*":
                     return;
@@ -64,19 +86,76 @@ public class MorseSender {
                     continue;
             }
 
+            // Handle random groups {N} (pure Java check)
+            if (input.startsWith("{") && input.endsWith("}")) {
+                String numberPart = input.substring(1, input.length() - 1);
+                boolean allDigits = true;
+                for (char c : numberPart.toCharArray()) {
+                    if (!Character.isDigit(c)) {
+                        allDigits = false;
+                        break;
+                    }
+                }
+
+                if (allDigits) {
+                    int rows = Integer.parseInt(numberPart);
+                    RandomGroups rg = new RandomGroups(rows);
+                    input = "\n" + rg.getMessage(); // prepend newline
+                    System.out.println("Generated:\n" + input);
+                }
+            }
+
+            // Expand bracket repeats [text]
+            input = expandBrackets(input).toUpperCase();
+
             int unit = 1200 / wpm;
             System.out.println("Text: " + input);
 
             for (char ch : input.toCharArray()) {
+                if (ch == '\u241E') { // special pause marker (between repeats)
+                    pause(unit * 7);
+                    continue;
+                } else if (ch == '\n' || ch == '\r') {
+                    pause(unit * 7);
+                    continue;
+                }
+
                 String code = MORSE.getOrDefault(ch, "");
                 for (char sym : code.toCharArray()) {
                     playSymbol(sym, unit);
-                    pause(unit); // Between symbols
+                    pause(unit);
                 }
-                pause(unit * 2); // Between letters
+                pause(unit * 2);
             }
-            pause(unit * 4); // Between words
+
+            pause(unit * 4); // final pause after message
             System.out.println();
+        }
+    }
+
+    public int getWpm() {
+        return wpm;
+    }
+
+    public void playText(String input) {
+        int unit = 1200 / wpm;
+        input = input.toUpperCase();
+
+        for (char ch : input.toCharArray()) {
+            if (ch == '\u241E') {
+                pause(unit * 7);
+                continue;
+            } else if (ch == '\n' || ch == '\r') {
+                pause(unit * 7);
+                continue;
+            }
+
+            String code = MORSE.getOrDefault(ch, "");
+            for (char sym : code.toCharArray()) {
+                playSymbol(sym, unit);
+                pause(unit);
+            }
+            pause(unit * 2);
         }
     }
 
@@ -99,7 +178,7 @@ public class MorseSender {
                 playSymbol('.', unit);
                 pause(unit);
                 if (System.in.available() > 0) {
-                    System.in.read(); // Consume key
+                    System.in.read(); // consume key
                     break;
                 }
             }
@@ -112,11 +191,36 @@ public class MorseSender {
         try {
             while (true) {
                 if (System.in.available() > 0) {
-                    System.in.read(); // Consume key
+                    System.in.read(); // consume key
                     break;
                 }
             }
         } catch (Exception ignored) {}
         toneGen.stop();
+    }
+
+    private String expandBrackets(String input) {
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        while (i < input.length()) {
+            if (input.charAt(i) == '[') {
+                int end = input.indexOf(']', i);
+                if (end > i) {
+                    String inside = input.substring(i + 1, end);
+                    for (int j = 0; j < 3; j++) {
+                        result.append(inside);
+                        if (j < 2) result.append('\u241E'); // special pause between repeats
+                    }
+                    i = end + 1;
+                } else {
+                    result.append('[');
+                    i++;
+                }
+            } else {
+                result.append(input.charAt(i));
+                i++;
+            }
+        }
+        return result.toString();
     }
 }
