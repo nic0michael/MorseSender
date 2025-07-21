@@ -61,7 +61,13 @@ MorseSender-1.0.jar
 ### To Run
 
 ```bash
-java -jar target/MorseSender-1.0.jar
+# Copy jar file
+cp target/MorseSender-1.0.jar ./MorseSender.jar
+
+# Run the jar program
+java -jar MorseSender.jar
+
+
 ```
 
 ---
