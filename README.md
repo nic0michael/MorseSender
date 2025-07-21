@@ -132,14 +132,15 @@ To generate fresh content for all 9 lessons:
 H E L L O 
 ```
 
-### Repeat:
+### Repeat Continuously:
 
 ```
 > [sos]
 S O S   (pause) S O S   (pause) S O S
 ```
+type s to stop
 
-### Random groups:
+### Random groups of 5 letters:
 
 ```
 > {2}
