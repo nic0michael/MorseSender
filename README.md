@@ -24,6 +24,7 @@ With intuitive commands and repeat functions, it’s perfect for beginners and s
 ---
 
 ## 📦 Run Without Building
+**Rename the file MorseSender-1.0.jarjar to MorseSender.jar**
 
 ```bash
 cp MorseSender-1.0.jarjar MorseSender.jar
