@@ -5,13 +5,13 @@ import java.nio.file.*;
 import java.util.*;
 
 public class LessonMaker {
-
     public static void makeRandomWords(String filename) {
         try {
             // ✅ Convert to mutable list to avoid UnsupportedOperationException
             List<String> allWords = new ArrayList<>(
                     Files.lines(Paths.get("dictionary.txt"))
                             .filter(line -> !line.isBlank())
+                            .map(String::toUpperCase) // 🔁 Make all words uppercase
                             .toList()
             );
 
@@ -23,27 +23,28 @@ public class LessonMaker {
             Random random = new Random();
             StringBuilder output = new StringBuilder();
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 4; i++) {
                 Collections.shuffle(allWords, random);
-                List<String> randomWords = allWords.subList(0, 10);
+                List<String> randomWords = allWords.subList(0, 6);
                 output.append(String.join(" ", randomWords)).append(System.lineSeparator());
             }
 
             Files.write(Paths.get(filename), output.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            System.out.println("Random words written to " + filename);
+            System.out.println("✅ Random words written to " + filename);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+
     public static void makeRandomCallsigns(String filename) {
         Random random = new Random();
         StringBuilder output = new StringBuilder();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             List<String> callsigns = new ArrayList<>();
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j < 4; j++) {
                 String prefix = randomLetters(1 + random.nextInt(2), random);
                 String number = randomDigits(1 + random.nextInt(2), random);
                 String suffix = randomLetters(1 + random.nextInt(3), random);
@@ -64,10 +65,10 @@ public class LessonMaker {
         Random random = new Random();
         StringBuilder output = new StringBuilder();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             List<String> groups = new ArrayList<>();
 
-            for (int j = 0; j < 5; j++) {
+            for (int j = 0; j < 4; j++) {
                 List<Character> chars = new ArrayList<>();
 
                 for (int k = 0; k < 4; k++) {
