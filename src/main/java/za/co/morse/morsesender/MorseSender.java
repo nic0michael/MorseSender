@@ -1,10 +1,12 @@
 package za.co.morse.morsesender;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class MorseSender {
+
     private final ToneGenerator toneGen;
     private int wpm;
     private final int freq;
@@ -26,15 +28,18 @@ public class MorseSender {
             {"7", "--..."}, {"8", "---.."}, {"9", "----."}, {".", ".-.-.-"},
             {",", "--..--"}, {"?", "..--.."}, {"=", "-...-"}, {" ", " "}
         };
-        for (String[] pair : data) MORSE.put(pair[0].charAt(0), pair[1]);
+        for (String[] pair : data) {
+            MORSE.put(pair[0].charAt(0), pair[1]);
+        }
     }
 
     public MorseSender(int freq, int wpm) {
         this.freq = freq;
         this.wpm = wpm;
         this.toneGen = new ToneGenerator(freq);
-        // Initialize mem slots to empty string
-        for (int i = 1; i <= 6; i++) mem[i] = "";
+        for (int i = 1; i <= 6; i++) {
+            mem[i] = "";
+        }
     }
 
     public void sender() {
@@ -42,13 +47,13 @@ public class MorseSender {
         System.out.println("\n\nZS6BVR Morse Code Sender");
         System.out.println("Speed: " + wpm + " WPM    Tone: " + freq + " Hz");
         System.out.println("Type message or special key and press ENTER");
-        System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous tone\n");
+        System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = tone, #ML = make lessons, #L1–#L9 = play lesson\n");
 
         while (true) {
             System.out.print("> ");
             String input = scanner.nextLine().trim();
 
-            // Check for !1 to !6 commands to store memory
+            // Store memory slot: !1 Hello
             if (input.length() > 2 && input.charAt(0) == '!' && input.charAt(1) >= '1' && input.charAt(1) <= '6' && input.charAt(2) == ' ') {
                 int slot = input.charAt(1) - '0';
                 mem[slot] = input.substring(3);
@@ -56,7 +61,7 @@ public class MorseSender {
                 continue;
             }
 
-            // Replace $1 to $6 placeholders with stored mem text if any
+            // Replace memory: $1
             for (int i = 1; i <= 6; i++) {
                 String key = "$" + i;
                 if (!mem[i].isEmpty() && input.contains(key)) {
@@ -64,8 +69,7 @@ public class MorseSender {
                 }
             }
 
-            // Special commands
-            switch (input) {
+            switch (input.toUpperCase()) {
                 case "*":
                     return;
                 case "+":
@@ -84,38 +88,47 @@ public class MorseSender {
                 case "#":
                     continuousToneMode();
                     continue;
+                case "#ML":
+                    LessonMaker.makeAllLessons();
+                    System.out.println("All lessons created.");
+                    continue;
+                default:
+                    // Handle #L1 to #L9
+                    if (input.toUpperCase().matches("#L[1-9]")) {
+                        int lessonNumber = Integer.parseInt(input.substring(2));
+                        String filename = "lesson" + lessonNumber + ".txt";
+
+                        try {
+                            String content = Files.readString(Paths.get(filename));
+                            System.out.println("Sending contents of " + filename + " as Morse:\n");
+                            playText(content);
+                        } catch (IOException e) {
+                            System.out.println("⚠️ Could not read " + filename);
+                            e.printStackTrace();
+                        }
+                        continue;
+                    }
             }
 
-            // Handle random groups {N} (pure Java check)
+            // Handle bracket repeater [text]
+            input = expandBrackets(input).toUpperCase();
+
+            // Random group: {10}
             if (input.startsWith("{") && input.endsWith("}")) {
                 String numberPart = input.substring(1, input.length() - 1);
-                boolean allDigits = true;
-                for (char c : numberPart.toCharArray()) {
-                    if (!Character.isDigit(c)) {
-                        allDigits = false;
-                        break;
-                    }
-                }
-
-                if (allDigits) {
+                if (numberPart.chars().allMatch(Character::isDigit)) {
                     int rows = Integer.parseInt(numberPart);
                     RandomGroups rg = new RandomGroups(rows);
-                    input = "\n" + rg.getMessage(); // prepend newline
+                    input = "\n" + rg.getMessage();
                     System.out.println("Generated:\n" + input);
                 }
             }
-
-            // Expand bracket repeats [text]
-            input = expandBrackets(input).toUpperCase();
 
             int unit = 1200 / wpm;
             System.out.println("Text: " + input);
 
             for (char ch : input.toCharArray()) {
-                if (ch == '\u241E') { // special pause marker (between repeats)
-                    pause(unit * 7);
-                    continue;
-                } else if (ch == '\n' || ch == '\r') {
+                if (ch == '\u241E' || ch == '\n' || ch == '\r') {
                     pause(unit * 7);
                     continue;
                 }
@@ -128,7 +141,7 @@ public class MorseSender {
                 pause(unit * 2);
             }
 
-            pause(unit * 4); // final pause after message
+            pause(unit * 4); // final pause
             System.out.println();
         }
     }
@@ -142,32 +155,40 @@ public class MorseSender {
         input = input.toUpperCase();
 
         for (char ch : input.toCharArray()) {
-            if (ch == '\u241E') {
-                pause(unit * 7);
-                continue;
-            } else if (ch == '\n' || ch == '\r') {
+            if (ch == '\u241E' || ch == '\n' || ch == '\r') {
+                System.out.print("\n");
                 pause(unit * 7);
                 continue;
             }
 
             String code = MORSE.getOrDefault(ch, "");
+            if (!code.isEmpty()) {
+                System.out.print(ch + " "); // 👈 print character being sent
+            }
+
             for (char sym : code.toCharArray()) {
                 playSymbol(sym, unit);
                 pause(unit);
             }
             pause(unit * 2);
         }
+
+        System.out.println(); // newline after sending
     }
 
     private void playSymbol(char symbol, int unit) {
-        if (symbol == '.') toneGen.send(unit);
-        else if (symbol == '-') toneGen.send(unit * 3);
+        if (symbol == '.') {
+            toneGen.send(unit);
+        } else if (symbol == '-') {
+            toneGen.send(unit * 3);
+        }
     }
 
     private void pause(int ms) {
         try {
             Thread.sleep(ms);
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
     }
 
     private void scopeMode() {
@@ -182,7 +203,8 @@ public class MorseSender {
                     break;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private void continuousToneMode() {
@@ -195,7 +217,8 @@ public class MorseSender {
                     break;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         toneGen.stop();
     }
 
@@ -209,7 +232,9 @@ public class MorseSender {
                     String inside = input.substring(i + 1, end);
                     for (int j = 0; j < 3; j++) {
                         result.append(inside);
-                        if (j < 2) result.append('\u241E'); // special pause between repeats
+                        if (j < 2) {
+                            result.append('\u241E');
+                        }
                     }
                     i = end + 1;
                 } else {

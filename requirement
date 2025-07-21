@@ -1,0 +1,214 @@
+We have the folowing Java 17 maven project
+
+package za.co.morse.morsesender;
+
+public class Main {
+    public static void main(String[] args) {
+        MorseSender sender = new MorseSender(800, 12);
+        sender.sender();
+    }
+}
+
+---
+
+package za.co.morse.morsesender;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class MorseSender {
+    private final ToneGenerator toneGen;
+    private int wpm;
+    private final int freq; // New field to store frequency
+
+    private static final Map<Character, String> MORSE = new HashMap<>();
+
+    static {
+        String[][] data = {
+            {"A", ".-"}, {"B", "-..."}, {"C", "-.-."}, {"D", "-.."}, {"E", "."},
+            {"F", "..-."}, {"G", "--."}, {"H", "...."}, {"I", ".."}, {"J", ".---"},
+            {"K", "-.-"}, {"L", ".-.."}, {"M", "--"}, {"N", "-."}, {"O", "---"},
+            {"P", ".--."}, {"Q", "--.-"}, {"R", ".-."}, {"S", "..."}, {"T", "-"},
+            {"U", "..-"}, {"V", "...-"}, {"W", ".--"}, {"X", "-..-"}, {"Y", "-.--"},
+            {"Z", "--.."}, {"0", "-----"}, {"1", ".----"}, {"2", "..---"},
+            {"3", "...--"}, {"4", "....-"}, {"5", "....."}, {"6", "-...."},
+            {"7", "--..."}, {"8", "---.."}, {"9", "----."}, {".", ".-.-.-"},
+            {",", "--..--"}, {"?", "..--.."}, {"=", "-...-"}, {" ", " "}
+        };
+        for (String[] pair : data) MORSE.put(pair[0].charAt(0), pair[1]);
+    }
+
+    public MorseSender(int freq, int wpm) {
+        this.freq = freq;
+        this.wpm = wpm;
+        this.toneGen = new ToneGenerator(freq);
+    }
+
+    public void sender() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\n\nZS6BVR Morse Code Sender");
+        System.out.println("Speed: " + wpm + " WPM    Tone: " + freq + " Hz");
+        System.out.println("Type message or special key and press ENTER");
+        System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous tone\n");
+
+        while (true) {
+            System.out.print("> ");
+            String input = scanner.nextLine().toUpperCase().trim();
+
+            switch (input) {
+                case "*":
+                    return;
+                case "+":
+                case "++":
+                    wpm += 5;
+                    System.out.println("WPM: " + wpm);
+                    continue;
+                case "-":
+                case "--":
+                    wpm = Math.max(1, wpm - 5);
+                    System.out.println("WPM: " + wpm);
+                    continue;
+                case "@":
+                    scopeMode();
+                    continue;
+                case "#":
+                    continuousToneMode();
+                    continue;
+            }
+
+            int unit = 1200 / wpm;
+            System.out.println("Text: " + input);
+
+            for (char ch : input.toCharArray()) {
+                String code = MORSE.getOrDefault(ch, "");
+                for (char sym : code.toCharArray()) {
+                    playSymbol(sym, unit);
+                    pause(unit); // Between symbols
+                }
+                pause(unit * 2); // Between letters
+            }
+            pause(unit * 4); // Between words
+            System.out.println();
+        }
+    }
+
+    private void playSymbol(char symbol, int unit) {
+        if (symbol == '.') toneGen.send(unit);
+        else if (symbol == '-') toneGen.send(unit * 3);
+    }
+
+    private void pause(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException ignored) {}
+    }
+
+    private void scopeMode() {
+        int unit = 1200 / wpm;
+        System.out.println("Scope mode: Sending continuous dots. Press any key to stop.");
+        try {
+            while (true) {
+                playSymbol('.', unit);
+                pause(unit);
+                if (System.in.available() > 0) {
+                    System.in.read(); // Consume key
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private void continuousToneMode() {
+        System.out.println("Continuous tone mode: Press any key to stop.");
+        toneGen.send();
+        try {
+            while (true) {
+                if (System.in.available() > 0) {
+                    System.in.read(); // Consume key
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+        toneGen.stop();
+    }
+}
+
+---
+
+package za.co.morse.morsesender;
+
+import javax.sound.sampled.*;
+
+public class ToneGenerator {
+    private final int frequency;
+    private final AudioFormat format;
+    private SourceDataLine line;
+    private volatile boolean keepRunning = false;
+
+    public ToneGenerator(int frequency) {
+        this.frequency = frequency;
+        this.format = new AudioFormat(44100, 16, 1, true, false);
+    }
+
+    // Send tone for a specified duration (used for Morse dots/dashes)
+    public void send(int durationMs) {
+        try {
+            byte[] tone = generateTone(durationMs);
+            try (SourceDataLine line = AudioSystem.getSourceDataLine(format)) {
+                line.open(format);
+                line.start();
+                line.write(tone, 0, tone.length);
+                line.drain();
+                line.stop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Send tone continuously until stop() is called (used for # mode)
+    public void send() {
+        try {
+            line = AudioSystem.getSourceDataLine(format);
+            line.open(format);
+            line.start();
+            keepRunning = true;
+
+            Thread thread = new Thread(() -> {
+                byte[] buffer = generateTone(100); // small looped chunk
+                while (keepRunning) {
+                    line.write(buffer, 0, buffer.length);
+                }
+                line.drain();
+                line.stop();
+                line.close();
+            });
+            thread.setDaemon(true);
+            thread.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stop() {
+        keepRunning = false;
+    }
+
+    private byte[] generateTone(int durationMs) {
+        int sampleRate = 44100;
+        int samples = (int) (sampleRate * durationMs / 1000.0);
+        byte[] buffer = new byte[samples * 2];
+
+        for (int i = 0; i < samples; i++) {
+            double angle = 2.0 * Math.PI * frequency * i / sampleRate;
+            short sample = (short) (Math.sin(angle) * Short.MAX_VALUE);
+            buffer[2 * i] = (byte) (sample & 0xFF);
+            buffer[2 * i + 1] = (byte) ((sample >> 8) & 0xFF);
+        }
+
+        return buffer;
+    }
+}
+
+modify MorseSender so if I put text inside square brakets [ ] to repeat it 3 times
