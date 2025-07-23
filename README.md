@@ -99,7 +99,7 @@ Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous
 | Command                | Description                                                                                                          |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `*`                    | Exit the program                                                                                                     |
-| `+` / `-`              | Increase/decrease speed by 5 WPM                                                                                     |
+| `+`/'++' /  `-`/'--'   | Increase/decrease speed by 1/5 WPM                                                                                     |
 | `@`                    | Send continuous dots (oscilloscope calibration)                                                                      |
 | `#`                    | Send continuous tone (frequency counter)                                                                             |
 | `#ML`                  | Generate new lessons (lesson1.txt to lesson9.txt)                                                                    |
