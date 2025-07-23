@@ -29,7 +29,7 @@ With intuitive commands and repeat functions, it’s perfect for beginners and s
 ```bash
 chmod 775 *.sh
 
-./install 
+./install.sh
 
 # Now run this everytime to start this
 ./start.sh
