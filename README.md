@@ -27,10 +27,20 @@ With intuitive commands and repeat functions, it’s perfect for beginners and s
 **Rename the file MorseSender-1.0.jarjar to MorseSender.jar**
 
 ```bash
-cp MorseSender-1.0.jarjar MorseSender.jar
+chmod 775 *.sh
 
-# now run (after installing Java : OpenJDK 17  see below)
-java -jar MorseSender.jar
+./install 
+
+# Now run this everytime to start this
+./start.sh
+
+
+# For Windows users we have:
+install.BAT 
+
+# and
+start.BAT
+
 ```
 
 ---
