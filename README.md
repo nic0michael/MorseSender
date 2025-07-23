@@ -15,11 +15,12 @@ With intuitive commands and repeat functions, it’s perfect for beginners and s
 
 - Converts typed text into audible Morse code
 - Adjustable speed (WPM - words per minute)
-- Special calibration and tone modes
-- Play predefined lesson files
-- Generate new lessons on demand
-- Store and reuse text via memory slots
-- Repeating brackets and random group modes
+- Special calibration for speed and tone frequency
+- Play Generated lesson files
+- Generate new lesson files on demand
+- Store and reuse text via 9 memories ... CQ DX de ZS6BVR
+- Repeating Message in brackets 
+- Generate random groups of 5 in square brackets
 
 ---
 
@@ -31,11 +32,11 @@ chmod 775 *.sh
 
 ./install.sh
 
-# Now run this everytime to start this
+# Now run this every time to start this
 ./start.sh
 
 
-# For Windows users we have:
+# For Windows users, we have:
 install.BAT 
 
 # and
