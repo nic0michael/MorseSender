@@ -45,7 +45,7 @@ start.BAT
 
 ---
 
-## 🔧 How to Build and Run
+## 🔧 How to Build and Run from Source Code
 
 ### Prerequisites
 
