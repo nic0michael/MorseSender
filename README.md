@@ -23,8 +23,9 @@ With intuitive commands and repeat functions, it’s perfect for beginners and s
 - Store and reuse text via 9 memories ... CQ DX de ZS6BVR
 - Repeating Message in brackets 
 - Generate random groups of 5 in square brackets
+- This is FOS (Free and Open-source) and works with your PC's Sound
 - The Lessons are :
-1. Random Groups of 5 with very wide spacing sent at 20WPM but effectively 10 WPM is the best way to learn Morse
+1. Random Groups of 5 with very wide spacing sent at 20WPM, but effectively 10 WPM is the best way to learn Morse
 2. Random English words
 3. Random Callsigns
 4. We generate 9 lessons every time
