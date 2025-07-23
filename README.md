@@ -99,9 +99,9 @@ Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous
 | Command                | Description                                                                                                          |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `*`                    | Exit the program                                                                                                     |
-| `+`/'++' /  `-`/'--'   | Increase/decrease speed by 1/5 WPM                                                                                     |
-| `@`                    | Send continuous dots (oscilloscope calibration)                                                                      |
-| `#`                    | Send continuous tone (frequency counter)                                                                             |
+| `+`/'++' /  `-`/'--'   | Increase/decrease speed by 1/5 WPM                                                                                   |
+| `@`                    | Send continuous dots (To Oscilloscope for speed calibration)                                                         |
+| `#`                    | Send continuous tone (To Frequency Counter for tone calibration)                                                     |
 | `#ML`                  | Generate new lessons (lesson1.txt to lesson9.txt)                                                                    |
 | `#L1` to `#L9`         | Send contents of lesson1.txt to lesson9.txt as Morse                                                                 |
 | `[text]`               | Repeat the text 3 times, with pauses                                                                                 |
