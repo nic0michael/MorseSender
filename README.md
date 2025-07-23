@@ -102,8 +102,8 @@ Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = continuous
 | `+` / `-`              | Increase/decrease speed by 5 WPM                                                                                     |
 | `@`                    | Send continuous dots (oscilloscope calibration)                                                                      |
 | `#`                    | Send continuous tone (frequency counter)                                                                             |
-| `#L1` to `#L9`         | Send contents of lesson1.txt to lesson9.txt as Morse                                                                 |
 | `#ML`                  | Generate new lessons (lesson1.txt to lesson9.txt)                                                                    |
+| `#L1` to `#L9`         | Send contents of lesson1.txt to lesson9.txt as Morse                                                                 |
 | `[text]`               | Repeat the text 3 times, with pauses                                                                                 |
 | `{N}`                  | Send `N` lines of 5-character groups (random, each with one digit)                                                   |
 | `!1 text` to `!6 text` | Store the given text in memory slot mem1 through mem6                                                                |
