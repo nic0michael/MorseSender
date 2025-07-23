@@ -2,7 +2,7 @@
 # ZS6BVR Morse Sender (Java Project)
 
 
-
+I used Software I wrote 40 years ago to help me pass the 12WPM code test and get my ZS License
 This Morse Sender is a powerful and user-friendly Java tool that translates text into authentic Morse code audio.
 
 It supports dynamic speed control, customizable tone frequency, random group generation, lesson playback, and memory macros.
@@ -15,12 +15,18 @@ With intuitive commands and repeat functions, it’s perfect for beginners and s
 
 - Converts typed text into audible Morse code
 - Adjustable speed (WPM - words per minute)
-- Special calibration for speed and tone frequency
+- Adjustable tone frequency (Hz)
+- Special calibration messages for speed and tone frequency
 - Play Generated lesson files
 - Generate new lesson files on demand
 - Store and reuse text via 9 memories ... CQ DX de ZS6BVR
 - Repeating Message in brackets 
 - Generate random groups of 5 in square brackets
+- The Lessons are :
+1. Random Groups of 5 with very wide spacing sent at 20WPM but effectively 10 WPM is the best way to learn Morse
+2. Random English words
+3. Random Callsigns
+4. We generate 9 lessons every time
 
 ---
 
@@ -211,5 +217,5 @@ java -version
 GNU General Public License (GPL v3)
 
 ---
-
+# 73 de Nico ZS6BVR
 
