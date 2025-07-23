@@ -2,7 +2,8 @@
 # ZS6BVR Morse Sender (Java Project)
 
 
-I used Software I wrote 40 years ago to help me pass the 12WPM code test and get my ZS License
+I used Software I wrote 40 years ago to help me pass the 12WPM code test and get my ZS License.
+
 This Morse Sender is a powerful and user-friendly Java tool that translates text into authentic Morse code audio.
 
 It supports dynamic speed control, customizable tone frequency, random group generation, lesson playback, and memory macros.
