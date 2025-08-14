@@ -1,8 +1,3 @@
-Here’s your updated **README.md** with the new `#H` help command added everywhere it makes sense (launch screen + commands reference):
-
----
-
-````markdown
 # ZS6BVR Morse Sender (Java Project)
 
 This Morse Sender is a powerful and user-friendly Java tool that translates text into authentic Morse code audio.
