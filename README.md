@@ -225,15 +225,5 @@ java -version
 
 GNU General Public License (GPL v3)
 
-```
-
 ---
-
-✅ Now the README shows:  
-- `#H` in the startup banner.  
-- `#H` in the **commands reference table**.  
-- Example usage of `#H` showing the help output.  
-
-Do you also want me to add `#h` (lowercase) explicitly in the docs, or should we just document `#H` and assume case-insensitive handling?
-```
 
