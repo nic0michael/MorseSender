@@ -212,13 +212,14 @@ public class MorseSender {
         System.out.println("12 WPM → 100.0 ms per dot");
 //        System.out.println("24 WPM → 50.0 ms per dot");
 //        System.out.println("48 WPM → 25.0 ms per dot");
-        System.out.println("Press any key to stop.");
+        System.out.println("Press Enter to stop.");
         try {
             while (true) {
                 playSymbol('.', unit);
                 pause(unit);
                 if (System.in.available() > 0) {
                     System.in.read(); // consume key
+                    freq=800;
                     break;
                 }
             }
@@ -228,9 +229,10 @@ public class MorseSender {
 
     private void continuousToneMode() {
         // 🔹 Override frequency with measuredFreq
-        this.freq = measuredFreq;
+        this.freq = 1000;
         System.out.println("Continuous tone mode: Using " + freq + " Hz (calibrated). Press any key to stop.");
-        ToneGenerator tone = new ToneGenerator(freq); // fresh generator with new freq
+        ToneGenerator tone = new ToneGenerator(freq); // fresh generator with new freq        
+        System.out.println("Press Enter to stop.");
         tone.send();
         try {
             while (true) {
