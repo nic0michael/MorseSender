@@ -9,7 +9,14 @@ public class MorseSender {
 
     private final ToneGenerator toneGen;
     private int wpm;
-    private final int freq;
+    private int freq;   // 🔹 not final anymore
+
+    // 🔹 New constant and calibration variables
+    private final String VERSION = "2.1";
+    private final int measuredFreq = 1000;
+    private final int measuredSpeedmS = 100;
+    private double freqCalibrationFactor;
+    private double speedCalibrationFactor;
 
     // Memory variables mem1 to mem6
     private final String[] mem = new String[7]; // index 1 to 6 used
@@ -35,8 +42,10 @@ public class MorseSender {
 
     public MorseSender(int freq, int wpm) {
         this.freq = freq;
-        this.wpm = wpm;
         this.toneGen = new ToneGenerator(freq);
+        this.speedCalibrationFactor = (double) 100/measuredSpeedmS; // 12 wpm test 100mS
+        this.freqCalibrationFactor = (double) 1000/measuredFreq; // 🔹1000Hz initialize calibration        
+        this.wpm = (int) (wpm * speedCalibrationFactor);
         for (int i = 1; i <= 6; i++) {
             mem[i] = "";
         }
@@ -44,13 +53,16 @@ public class MorseSender {
 
     public void sender() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("\n\nZS6BVR Morse Code Sender");
+        System.out.println("\n\nZS6BVR Morse Code Sender Version " + VERSION);
         System.out.println("Speed: " + wpm + " WPM    Tone: " + freq + " Hz");
+        System.out.println("Calibration Factor: " + freqCalibrationFactor);
         System.out.println("Type message or special key and press ENTER");
-        System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = tone, #ML = make lessons, #L1–#L9 = play lesson\n");
+        System.out.println("Special keys: * = quit, + = faster, - = slower, @ = dots (scope), # = tone, #ML = make lessons, #L1–#L9 = play lesson");
+        System.out.println("Type #H for help\n");
 
         while (true) {
-            System.out.print("> ");
+            // 🔹 Prompt now shows WPM
+            System.out.print(wpm + " WPM > ");
             String input = scanner.nextLine().trim();
 
             // Store memory slot: !1 Hello
@@ -72,6 +84,9 @@ public class MorseSender {
             switch (input.toUpperCase()) {
                 case "*":
                     return;
+                case "#H":
+                    showHelp();
+                    continue;
                 case "+":
                 case "++":
                     wpm += 5;
@@ -193,7 +208,11 @@ public class MorseSender {
 
     private void scopeMode() {
         int unit = 1200 / wpm;
-        System.out.println("Scope mode: Sending continuous dots. Press any key to stop.");
+        System.out.println("Scope mode: Sending continuous dots. Speed:"+wpm+" WPM");
+        System.out.println("12 WPM → 100.0 ms per dot");
+//        System.out.println("24 WPM → 50.0 ms per dot");
+//        System.out.println("48 WPM → 25.0 ms per dot");
+        System.out.println("Press any key to stop.");
         try {
             while (true) {
                 playSymbol('.', unit);
@@ -208,8 +227,11 @@ public class MorseSender {
     }
 
     private void continuousToneMode() {
-        System.out.println("Continuous tone mode: Press any key to stop.");
-        toneGen.send();
+        // 🔹 Override frequency with measuredFreq
+        this.freq = measuredFreq;
+        System.out.println("Continuous tone mode: Using " + freq + " Hz (calibrated). Press any key to stop.");
+        ToneGenerator tone = new ToneGenerator(freq); // fresh generator with new freq
+        tone.send();
         try {
             while (true) {
                 if (System.in.available() > 0) {
@@ -219,7 +241,7 @@ public class MorseSender {
             }
         } catch (Exception ignored) {
         }
-        toneGen.stop();
+        tone.stop();
     }
 
     private String expandBrackets(String input) {
@@ -247,5 +269,24 @@ public class MorseSender {
             }
         }
         return result.toString();
+    }
+
+    // 🔹 Help method
+    private void showHelp() {
+        System.out.println("\nHelp — Command Reference:\n");
+        System.out.println("\n\nZS6BVR Morse Code Sender Version " + VERSION);
+        System.out.println("  *           Exit the program");
+        System.out.println("  + / ++      Increase speed (WPM)");
+        System.out.println("  - / --      Decrease speed (WPM)");
+        System.out.println("  @           Send continuous dots (scope calibration)");
+        System.out.println("  #           Continuous tone (tone calibration, 1000 Hz)");
+        System.out.println("  #H          Show this help message");
+        System.out.println("  #ML         Regenerate lesson files");
+        System.out.println("  #L1–#L9     Play lessons 1–9");
+        System.out.println("  [text]      Repeat 'text' 3 times with pauses");
+        System.out.println("  {N}         Send N lines of random 5-character groups");
+        System.out.println("  !1–!6 text  Store text in memory slot 1–6");
+        System.out.println("  $1–$6       Insert stored text from memory slot 1–6");
+        System.out.println("  Any other text — Sent as Morse code\n");
     }
 }
