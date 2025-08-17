@@ -11,12 +11,13 @@ public class MorseSender {
     private int wpm;
     private int freq;   // 🔹 not final anymore
 
-    // 🔹 New constant and calibration variables
+    private String callsign = "";
     private final String VERSION = "2.1";
     private final int measuredFreq = 1000;
-    private final int measuredSpeedmS = 100;
+    private final int measuredSpeedmS = 92;
     private double freqCalibrationFactor;
     private double speedCalibrationFactor;
+    private int beaconIntervalMs = 60000 / 4;
 
     // Memory variables mem1 to mem6
     private final String[] mem = new String[7]; // index 1 to 6 used
@@ -43,9 +44,10 @@ public class MorseSender {
     public MorseSender(int freq, int wpm) {
         this.freq = freq;
         this.toneGen = new ToneGenerator(freq);
-        this.speedCalibrationFactor = (double) 100/measuredSpeedmS; // 12 wpm test 100mS
-        this.freqCalibrationFactor = (double) 1000/measuredFreq; // 🔹1000Hz initialize calibration        
-        this.wpm = (int) (wpm * speedCalibrationFactor);
+        this.speedCalibrationFactor = (double) 100 / measuredSpeedmS; // 12 wpm test 100mS
+        this.freqCalibrationFactor = (double) 1000 / measuredFreq; // 🔹1000Hz initialize calibration        
+        this.wpm = wpm;
+        System.out.println("Initial WPM: " + wpm);
         for (int i = 1; i <= 6; i++) {
             mem[i] = "";
         }
@@ -88,13 +90,25 @@ public class MorseSender {
                     showHelp();
                     continue;
                 case "+":
+                    wpm++;
+                    System.out.println("WPM: " + wpm);
+                    continue;
                 case "++":
                     wpm += 5;
                     System.out.println("WPM: " + wpm);
                     continue;
                 case "-":
+                    wpm--;
+                    if (wpm < 1) {
+                        wpm = 1;
+                    }
+                    System.out.println("WPM: " + wpm);
+                    continue;
                 case "--":
-                    wpm = Math.max(1, wpm - 5);
+                    wpm -= 5;
+                    if (wpm < 1) {
+                        wpm = 1;
+                    }
                     System.out.println("WPM: " + wpm);
                     continue;
                 case "@":
@@ -107,6 +121,47 @@ public class MorseSender {
                     LessonMaker.makeAllLessons();
                     System.out.println("All lessons created.");
                     continue;
+
+                case "#B": // Beacon mode
+                    if (!callsign.isEmpty()) {
+                        System.out.println("Beacon mode: Sending callsign '" + callsign + "' every "
+                                + (beaconIntervalMs / 1000) + " seconds.");
+                        System.out.println("Press Enter to stop.");
+                        try {
+                            while (true) {
+                                playText(callsign + "  ");
+                                pause(beaconIntervalMs);
+                                if (System.in.available() > 0) {
+                                    System.in.read(); // consume key
+                                    break;
+                                }
+                            }
+                        } catch (Exception ignored) {
+                        }
+                    } else {
+                        System.out.println("⚠️ No callsign stored. Use #C first.");
+                    }
+                    continue;
+
+                case "#C":
+                    System.out.print("Enter callsign: ");
+                    callsign = scanner.nextLine().trim().toUpperCase();
+                    if (!callsign.isEmpty()) {
+                        System.out.print("Enter beacon interval in seconds (default 60): ");
+                        String inputInterval = scanner.nextLine().trim();
+                        if (!inputInterval.isEmpty() && inputInterval.chars().allMatch(Character::isDigit)) {
+                            int seconds = Integer.parseInt(inputInterval);
+                            if (seconds > 0) {
+                                beaconIntervalMs = seconds * 1000;
+                            }
+                        }
+                        System.out.println("Callsign stored: " + callsign
+                                + " | Beacon interval: " + (beaconIntervalMs / 1000) + " sec");
+                    } else {
+                        System.out.println("⚠️ Callsign not stored (empty input).");
+                    }
+                    continue;
+
                 default:
                     // Handle #L1 to #L9
                     if (input.toUpperCase().matches("#L[1-9]")) {
@@ -139,7 +194,7 @@ public class MorseSender {
                 }
             }
 
-            int unit = 1200 / wpm;
+            int unit = 1200 / calculateMorseSpeed();
             System.out.println("Text: " + input);
 
             for (char ch : input.toCharArray()) {
@@ -166,7 +221,7 @@ public class MorseSender {
     }
 
     public void playText(String input) {
-        int unit = 1200 / wpm;
+        int unit = 1200 / calculateMorseSpeed();
         input = input.toUpperCase();
 
         for (char ch : input.toCharArray()) {
@@ -207,8 +262,8 @@ public class MorseSender {
     }
 
     private void scopeMode() {
-        int unit = 1200 / wpm;
-        System.out.println("Scope mode: Sending continuous dots. Speed:"+wpm+" WPM");
+        int unit = 1200 / calculateMorseSpeed();
+        System.out.println("Scope mode: Sending continuous dots. Speed:" + wpm + " WPM");
         System.out.println("12 WPM → 100.0 ms per dot");
 //        System.out.println("24 WPM → 50.0 ms per dot");
 //        System.out.println("48 WPM → 25.0 ms per dot");
@@ -219,7 +274,7 @@ public class MorseSender {
                 pause(unit);
                 if (System.in.available() > 0) {
                     System.in.read(); // consume key
-                    freq=800;
+                    freq = 800;
                     break;
                 }
             }
@@ -283,6 +338,8 @@ public class MorseSender {
         System.out.println("  @           Send continuous dots (scope calibration)");
         System.out.println("  #           Continuous tone (tone calibration, 1000 Hz)");
         System.out.println("  #H          Show this help message");
+        System.out.println("  #C          Save your callsign and Beacon delay");
+        System.out.println("  #B          Beacon mode — send your callsign every minute");
         System.out.println("  #ML         Regenerate lesson files");
         System.out.println("  #L1–#L9     Play lessons 1–9");
         System.out.println("  [text]      Repeat 'text' 3 times with pauses");
@@ -290,5 +347,9 @@ public class MorseSender {
         System.out.println("  !1–!6 text  Store text in memory slot 1–6");
         System.out.println("  $1–$6       Insert stored text from memory slot 1–6");
         System.out.println("  Any other text — Sent as Morse code\n");
+    }
+
+    int calculateMorseSpeed() {
+        return (int) (wpm * speedCalibrationFactor);
     }
 }
