@@ -53,6 +53,11 @@ public class MorseSender {
         }
     }
 
+    
+    int calculateMorseSpeed() {
+        return (int) (wpm * speedCalibrationFactor);
+    }
+
     public void sender() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\n\nZS6BVR Morse Code Sender Version " + VERSION);
@@ -349,7 +354,4 @@ public class MorseSender {
         System.out.println("  Any other text — Sent as Morse code\n");
     }
 
-    int calculateMorseSpeed() {
-        return (int) (wpm * speedCalibrationFactor);
-    }
 }
